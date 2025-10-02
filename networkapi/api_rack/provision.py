@@ -586,13 +586,15 @@ class Provision:
             #### ANOTHER BERRINI BLOCK
             ## Here we invert the variables of description, due unique template to diferent spines
             ## without this invertion, the description run well on spine 2 but on spine 1 they are inverted
-
+            variablestochangeleaf1['DFS_SOURCE_IP'] = '10.126.24.12'
+            variablestochangeleaf1['DFS_PEER_IP'] = '10.126.24.13'
+            variablestochangeleaf1["INT_GERENCIA_OOB"] = "47"
             log.debug(variablestochangeleaf1)
             if int(equip.get('nome')[-1]) == 2:
                 ### Here we must have to invert the variables to leaf2, due the new topology
                 # sp1_hostname = variablestochangeleaf1["SP1_HOSTNAME"]
-                # sp2_hostname = variablestochangeleaf1["SP2_HOSTNAME"]
-                # variablestochangeleaf1["SP1_HOSTNAME"] = sp2_hostname
+                sp2_hostname = variablestochangeleaf1["SP2_HOSTNAME"]
+                variablestochangeleaf1["SP1_HOSTNAME"] = sp2_hostname
                 # variablestochangeleaf1["SP2_HOSTNAME"] = sp1_hostname
 
                 # if1_sp1 = variablestochangeleaf1['INTERFACE1_SP1']
@@ -600,12 +602,12 @@ class Provision:
                 # if3_sp1 = variablestochangeleaf1['INTERFACE3_SP1']
                 # if4_sp1 = variablestochangeleaf1['INTERFACE4_SP1']
 
-                # if1_sp2 = variablestochangeleaf1['INTERFACE1_SP2']
+                if1_sp2 = variablestochangeleaf1['INTERFACE1_SP2']
                 # if2_sp2 = variablestochangeleaf1['INTERFACE2_SP2']
                 # if3_sp2 = variablestochangeleaf1['INTERFACE3_SP2']
                 # if4_sp2 = variablestochangeleaf1['INTERFACE4_SP2']
 
-                # variablestochangeleaf1['INTERFACE1_SP1'] = if1_sp2
+                variablestochangeleaf1['INTERFACE1_SP1'] = if1_sp2
                 # variablestochangeleaf1['INTERFACE2_SP1'] = if2_sp2
                 # variablestochangeleaf1['INTERFACE3_SP1'] = if3_sp2
                 # variablestochangeleaf1['INTERFACE4_SP1'] = if4_sp2
@@ -614,6 +616,15 @@ class Provision:
                 # variablestochangeleaf1['INTERFACE2_SP2'] = if2_sp1
                 # variablestochangeleaf1['INTERFACE3_SP2'] = if3_sp1
                 # variablestochangeleaf1['INTERFACE4_SP2'] = if4_sp1
+
+                vlan_bo_leaf_sp1 = variablestochangeleaf1["VLANBORDALEAFSP1"]
+                vlan_bo_leaf_sp2 = variablestochangeleaf1["VLANBORDALEAFSP2"]
+
+                variablestochangeleaf1["VLANBORDALEAFSP1"] = vlan_bo_leaf_sp2
+                variablestochangeleaf1["INT_GERENCIA_OOB"] = "48"
+                # variablestochangeleaf1["VLANBORDALEAFSP1"] = str(vlanBO[spn])
+                # variablestochangeleaf1["VLANBORDALEAFSP2"] = str(vlanBO[spn + 1])
+
 
                 vlan_ber_be1= variablestochangeleaf1["VLANBERBELEAFSP1"]
                 vlan_ber_be2= variablestochangeleaf1["VLANBERBELEAFSP2"]
@@ -635,9 +646,12 @@ class Provision:
                 variablestochangeleaf1["VLANBERBORDACACHOSLEAFSP2"] = vlan_ber_bc1
                 variablestochangeleaf1["VLANBERBORDACACHOSBLEAFSP1"] = vlan_ber_bcb2
                 variablestochangeleaf1["VLANBERBORDACACHOSBLEAFSP2"] = vlan_ber_bcb1
+
+                variablestochangeleaf1['DFS_SOURCE_IP'] = '10.126.24.13'
+                variablestochangeleaf1['DFS_PEER_IP'] = '10.126.24.12'
                 # as_spine1 = variablestochangeleaf1["ASSPINE1"]
-                # as_spine2 = variablestochangeleaf1["ASSPINE2"]
-                # variablestochangeleaf1["ASSPINE1"] = as_spine2
+                as_spine2 = variablestochangeleaf1["ASSPINE2"]
+                variablestochangeleaf1["ASSPINE1"] = as_spine2
                 # variablestochangeleaf1["ASSPINE2"] = as_spine1
 
             # variablestochangeleaf1['LFPO1'] = variablestochangeleaf1['INTERFACE1_SP1'].split('/')[-1].split(':')[0]
@@ -645,6 +659,13 @@ class Provision:
             variablestochangeleaf1["BASE_NETWORK_HOST_FE_IPV4"] = variablestochangeleaf1["NET_HOST_FE_IPV4"].split("/")[0]
 
             variablestochangeleaf1["BASE_NETWORK_HOST_BE_IPV4"] = variablestochangeleaf1["NET_HOST_BE_IPV4"].split("/")[0]
+
+            variablestochangeleaf1["BASE_NETWORK_HOST_FE_IPV6"] = variablestochangeleaf1["NET_HOST_FE_IPV6"].split("/")[0]
+            variablestochangeleaf1["BASE_NETWORK_HOST_BE_IPV6"] = variablestochangeleaf1["NET_HOST_BE_IPV6"].split("/")[0]
+            variablestochangeleaf1['BASE_MASK_HOST_BE_IPV6'] = variablestochangeleaf1["NET_HOST_BE_IPV6"].split("/")[1]
+
+            variablestochangeleaf1['BASE_NETWORK_HOST_BO_DSR_IPV6'] = variablestochangeleaf1['NET_HOST_BO_DSR_IPV6'].split('/')[0]
+            variablestochangeleaf1['BASE_MASK_HOST_BO_DSR_IPV6'] = variablestochangeleaf1['NET_HOST_BO_DSR_IPV6'].split('/')[1]
 
             ### End Berrini Block
 
@@ -727,6 +748,7 @@ class Provision:
         variablestochangeoob["OWN_IP_MGMT"] = oob.get("ip_mngt")
         variablestochangeoob["HOSTNAME_OOB"] = oob.get("nome")
         variablestochangeoob["HOSTNAME_RACK"] = self.rack.nome
+        log.debug(equips_sorted)
 
         fileinoob = path_to_guide + oob.get("roteiro")
         fileoutoob = path_to_config + oob.get("nome") + ".cfg"
@@ -735,6 +757,18 @@ class Provision:
             nome = equip.get("nome")
             log.debug(str(nome))
             roteiro = equip.get("roteiro")
+
+            ### To Pop Berrini
+            base_leaf_hostname = "LF-" + variablestochangeoob['HOSTNAME_OOB'].split('-')[1] + "-R"+ str(self.rack.numero) +"-"
+            variablestochangeoob['LEAF1_HOSTNAME'] = base_leaf_hostname + "1"
+            variablestochangeoob['LEAF2_HOSTNAME'] = base_leaf_hostname + "2"
+
+            variablestochangecore1["CHANNEL_NUMBER"] = str(self.rack.numero)
+            variablestochangecore2["CHANNEL_NUMBER"] = str(self.rack.numero)
+            variablestochangecore1["RACK_NUMBER"] = str(self.rack.numero)
+            variablestochangecore2["RACK_NUMBER"] = str(self.rack.numero)
+            ### End Block
+
             if nome[:3] == self.leaf_prefix:
                 if nome[-1] == "1":
                     variablestochangeoob["HOSTNAME_LF1"] = nome
